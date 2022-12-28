@@ -82,7 +82,7 @@ class Model {
     this.DB = new DB()
   }
 
-  UUID() {
+  UUID(separator = '') {
     var rand = Math.random
 
     var nbr, randStr = ""
@@ -90,11 +90,11 @@ class Model {
           randStr += (nbr = rand()).toString(16).substr(3, 6)
       } while (randStr.length < 30)
       return (
-          randStr.substr(0, 8) + "-" +
-          randStr.substr(8, 4) + "-4" +
-          randStr.substr(12, 3) + "-" +
+          randStr.substr(0, 8) + separator +
+          randStr.substr(8, 4) + separator + "4" +
+          randStr.substr(12, 3) + separator +
           ((nbr*4|0)+8).toString(16) + // [89ab]
-          randStr.substr(15, 3) + "-" +
+          randStr.substr(15, 3) + separator +
           randStr.substr(18, 12)
       )
   }
@@ -131,7 +131,7 @@ class Model {
       }
     ]
   */
-  _get (tableName, criteria  = null) {
+  _get (tableName, criteria = null) {
     const start = performance.now()
     var table = this.DB.get(tableName)
     var data = null
