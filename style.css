@@ -1,0 +1,17 @@
+.codex {
+    font-size: 14px;
+    font-family: 'Consolas';
+    background: #262c39;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    min-height: 120px;
+}
+
+.logo {
+    background: rgb(51,0,113);
+    background: linear-gradient(45deg, rgba(51,0,113,1) 0%, rgba(36,14,176,1) 60%, rgba(0,212,255,1) 100%);
+    color: #fff !important;
+    padding: 2px 13px 2px 13px;
+    border-radius: 3px;
+}

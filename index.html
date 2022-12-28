@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.104.2">
+    <title>LDBX Demo</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/pricing/">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
+    <meta name="theme-color" content="#712cf9">
+
+
+    <style>
+      .input-form {
+        background-color: rgb(235, 235, 235);
+        border: none;
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="style.css" rel="stylesheet">
+  </head>
+<body>
+
+
+<div class="container py-3">
+  <header>
+    <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center text-dark text-decoration-none logo">
+        <span class="fs-4 fw-bold">LDBX</span>
+      </a>
+
+      <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+        <a class="me-3 py-2 text-dark text-decoration-none" href="#example">Example</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="#usage">API Usage</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="#">Support</a>
+      </nav>
+    </div>
+
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+      <h1 class="display-4 fw-normal">LDBX</h1>
+      <p class="fs-5 text-muted">Local Storage management with syntax style like <a href="https://laravel.com/" target="_blank">Laravel</a> Eloquent using native Javascript</p>
+    </div>
+  </header>
+
+  <!-- Store Section -->
+  <main id="example" class="row">
+    <div>
+      <h3 class="text-primary fw-bold"># Store</h3>
+      <p>You can test store into localstorage with this example, you can define the table / source and define the object structure for every data you want to save.</p>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <div class="table-responsive">
+        <div class="text-center px-2"><h4 class="fw-bold">Table / Source</h4>
+          <input id="tableName" value="users" class="form-control input-form" >
+        </div>
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Key</th>
+              <th style="width: 22%;">Value</th>
+              <th style="width: 5%;"></th>
+            </tr>
+          </thead>
+          <tbody id="objectModel">
+            <tr id="baseObject0">
+              <td>
+                <input value="name" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <input value="john" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <button onclick="deleteObject(0)" class="btn btn-danger">🗙</button>
+              </td>
+            </tr>
+            <tr id="baseObject1">
+              <td>
+                <input value="born_date" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <input value="1994-02-29" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <button onclick="deleteObject(1)" class="btn btn-danger">🗙</button>
+              </td>
+            </tr>
+            <tr id="baseObject2">
+              <td>
+                <input value="iq" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <input value="321" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <button onclick="deleteObject(2)" class="btn btn-danger">🗙</button>
+              </td>
+            </tr>
+            <tr id="baseObject3">
+              <td>
+                <input value="is_alive" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <input value="true" onchange="refreshObject()" class="form-control input-form">
+              </td>
+              <td>
+                <button onclick="deleteObject(3)" class="btn btn-danger">🗙</button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody id="columnSave">
+            <tr>
+              <td colspan="2">When you added new colum, you can update the structure object of data using "<code class="text-danger">fixStructure</code>" </td>
+              <td>
+                <button id="addObject" class="btn btn-primary btn-full">+ Add</button>
+              </td>
+            </tr>
+            <tr>
+              <td ></td>
+              <td colspan="2" class="text-end">
+                <button onClick="store()" class="btn btn-success btn-full">Store to LDB</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <div class="text-center px-2"><h4 class="fw-bold">Object Result</h4></div>
+      <pre  id="objectDisplay" class="codex"><code class="language-json"></code></pre>
+    
+      <div class="text-center px-2"><h4 class="fw-bold">LDB Logs</h4></div>
+      <pre id="ldbStoreLog" class="codex"><code class="language-json"></code></pre>
+    
+    </div>
+
+  </main>
+  <!-- Modal Edit -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit : <span id="editId"></span></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="columnEdit"> </div>
+        </div>
+        <div class="modal-footer">
+          <button id="closeModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" onClick="updateData()" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Filter -->
+  <div class="modal fade modal-lg" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="filterModalLabel">Filter</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h4 class="fw-bold text-primary">Single Selector</h4>
+          <div id="filterList"></div>
+          <h4 class="fw-bold text-primary">Multiple Selector</h4>
+          <div id="filterList2"></div>
+
+          <pre id="filterDisplay" class="codex"></pre>
+        </div>
+        <div class="modal-footer">
+          <button id="closeModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" onClick="resetFilter()" class="btn btn-outline-secondary ">Reset Filter</button>
+          <button type="button" onClick="reloadData()" class="btn btn-primary">Filter Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Store Section -->
+   <main class="row">
+    <div>
+      <h3 class="text-primary fw-bold"># Manage </h3>
+      <p>you can Edit, Delete & Query of data you have, and has support to filter by date data type </p>
+    </div>
+    <div class="col-xs-12 ">
+      <div class="table-responsive">
+        <button onClick="cleanUp()" class="btn btn-danger btn-full">Clear LDB</button>
+        <button data-bs-toggle="modal" data-bs-target="#filterModal" class="btn btn-secondary">Filter / Query</button>
+        <table class="table text-center">
+          <thead id="tableHead"></thead>
+          <tbody id="tableData">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <main id="usage" class="mt-5">
+    <div>
+      <h3 class="text-primary fw-bold"># API Usage</h3>
+      <p>
+        There some instruction to use this plugin
+      </p>
+    </div>
+  </main>
+
+  <footer class="pt-4 my-md-5 pt-md-5 border-top">
+    <div class="row">
+      <div class="col-12 col-md">
+        <small class="d-block mb-3 text-muted">&copy; 2021–2022 | <a href="https://github.com/ikhbalfuady" >ikhbalfuady</a></small>
+      </div>
+
+    </div>
+  </footer>
+</div>
+
+<script src="ldbx.js"></script>
+<script>
+
+  let counter = 0;
+    
+  var tableName = document.querySelector('#tableName').value
+  var DataModel = new Model(tableName)
+  const objectModel = document.getElementById('objectModel');
+  
+  // Function to add a new tr element
+  function addTrElement() {
+    const tr = document.createElement('tr');
+    tr.id = `baseObject${counter}`;
+    tr.innerHTML = `
+      <td>
+        <input onChange="refreshObject()" class="form-control input-form">
+      </td>
+      <td>
+        <input onChange="refreshObject()" class="form-control input-form">
+      </td>
+      <td>
+        <button onClick="deleteObject(${counter})" class="btn btn-danger">🗙</button>
+      </td>
+    `;
+    objectModel.appendChild(tr);
+
+    counter++;
+  }
+
+  // Add an event listener to the delete button
+  function deleteObject (idx) {
+    document.querySelector(`#baseObject${idx}`).remove();
+    refreshObject()
+  }
+
+  // Add an event listener to the addObject button
+  const addObjectButton = document.getElementById('addObject');
+  addObjectButton.addEventListener('click', addTrElement);
+
+  // Function to get the data of the objectModel element
+  function getObjectFromTable() {
+    // Get the table element
+    const table = document.getElementById('objectModel');
+
+    // Initialize an empty object
+    const object = {};
+
+    // Iterate over the rows in the table
+    for (let i = 0; i < table.rows.length; i++) {
+      // Get the current row
+      const row = table.rows[i];
+
+      // Get the key and value cells for the current row
+      const keyCell = row.cells[0];
+      const valueCell = row.cells[1];
+
+      // Get the key and value from the input elements in the cells
+      let key = keyCell.querySelector('input').value;
+      let value = valueCell.querySelector('input').value;
+      var fixValue = value
+      if (value === 'true') fixValue = true
+      else if (value === 'false') fixValue = false
+      else if (!isNaN(value)) fixValue = parseFloat(value)
+      // Add the key-value pair to the object
+      object[key] = fixValue;
+    }
+
+    // Return the object
+    return object;
+  }
+
+  function objectDisplayFormater (data) {
+    document.getElementById('objectDisplay').innerHTML= JSON.stringify(data);
+  }
+
+  function getColumnFillable () {
+    var obj = getObjectFromTable()
+    var res = []
+    for (k in obj) { res.push(k) } 
+    return res
+  }
+
+  function getFilterDisplay () {
+    var columns = getColumnFillable()
+
+    var res = 'var data = Model'
+
+    var valueId = el(`#filter_value_id`).value
+    if (valueId) res += `.where('id', '${valueId}') \n`
+
+    for (col of columns) {
+      var operator = el(`#filter_operator_${col}`).value
+      var value = el(`#filter_value_${col}`).value
+      if (value) res += `.where('${col}', '${operator}', '${value}') \n`
+    }
+
+    var colx = el(`#filter2_column`).value
+    var opr1 = el(`#filter2_operator1`).value
+    var opr2 = el(`#filter2_operator2`).value
+    var val1 = el(`#filter2_value1`).value
+    var val2 = el(`#filter2_value2`).value
+    if (val1 && val2) {
+      res += `.where('${colx}', '${opr1}', '${val1}').where('${colx}', '${opr2}', '${val2}') \n`
+    }
+
+    el(`#filterDisplay`).innerHTML = res
+  }
+
+  function getFilterList () {
+    var columns = getColumnFillable()
+
+    var filterList = ''
+      filterList += `
+        <div class="mb-3 row">
+        <div class="col-sm-2 col-form-label fw-bold ">ID</div>
+        <div class="col-sm-10">
+          <input onChange="getFilterDisplay()" class="form-control" id="filter_value_id">
+        </div>
+      </div>
+      `
+    for (col of columns) {
+      filterList += `
+        <div class="mb-3 row">
+        <div class="col-sm-2 col-form-label fw-bold ">${col}</div>
+        <div class="col-sm-5">
+          <select onChange="getFilterDisplay()" class="form-control" id="filter_operator_${col}">
+            <option value="=">Equal (=)</option>
+            <option value="like">Contains (like)</option>
+            <option value=">">Greather Than (>)</option>
+            <option value=">=">Greather Than Equal(>=)</option>
+            <option value="<">Less Than(<)</option>
+            <option value="<=">Less Than Equal(<=)</option>
+          </select>
+        </div>
+        <div class="col-sm-5">
+          <input onChange="getFilterDisplay()" class="form-control" id="filter_value_${col}">
+        </div>
+      </div>
+      `
+    }
+
+    el('#filterList').innerHTML = filterList
+  }
+
+  function getFilterList2 () {
+    var columns = getColumnFillable()
+
+    var colOpt = ''
+    for (col of columns) {
+      colOpt += `<option value="${col}">${col}</option>`
+    }
+
+    var filterList = ''
+    filterList += `
+      <div class="mb-3 row">
+        <div class="col-sm-12 mb-3">
+        <select onChange="getFilterDisplay()" class="form-control" id="filter2_column">
+         ${colOpt}
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator1">
+          <option value="=">Equal (=)</option>
+          <option value="like">Contains (like)</option>
+          <option value=">">Greather Than (>)</option>
+          <option value=">=">Greather Than Equal(>=)</option>
+          <option value="<">Less Than(<)</option>
+          <option value="<=">Less Than Equal(<=)</option>
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <input onChange="getFilterDisplay()" class="form-control" id="filter2_value1">
+      </div>
+      <div class="col-sm-3">
+        <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator2">
+          <option value="=">Equal (=)</option>
+          <option value="like">Contains (like)</option>
+          <option value=">">Greather Than (>)</option>
+          <option value=">=">Greather Than Equal(>=)</option>
+          <option value="<">Less Than(<)</option>
+          <option value="<=">Less Than Equal(<=)</option>
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <input onChange="getFilterDisplay()" class="form-control" id="filter2_value2">
+      </div>
+    </div>
+    `
+
+    el('#filterList2').innerHTML = filterList
+  }
+
+  function refreshObject () {
+    objectDisplayFormater(getObjectFromTable())
+    // objectDisplayFormater(getObjectModelData())
+
+    // fixing table structure if changed
+    var columns = getColumnFillable()
+    DataModel.fixStructure(columns)
+
+    // get data table
+    getAllData()
+    getFilterList()
+    getFilterList2()
+  }
+
+  function initDemoData () {
+    var send = [
+      {"name":"John","born_date":"1994-02-29","iq":120,"is_alive":true},
+      {"name":"Doe","born_date":"1999-05-19","iq":140,"is_alive":true},
+      {"name":"Alice","born_date":"2000-11-24","iq":115,"is_alive":true},
+      {"name":"George","born_date":"2000-06-24","iq":130,"is_alive":'false'},
+    ]
+
+    var list = DataModel.get()
+
+    if (list && !list.length) {
+    
+      for (row of send) {
+        DataModel.save(row)
+      }
+    }
+  }
+  
+  initDemoData()
+  refreshObject()
+
+  /* Logic */
+
+  function el (selector) {
+    return document.querySelector(selector)
+  }
+
+  function cleanUp() {
+    if (confirm('Are you sure want to clean up this data ?')) {
+      DataModel.truncate();  //item
+      refreshObject()
+    }
+  }
+
+  function resetFilter () {
+    var columns = getColumnFillable()
+    for (col of columns) {
+      var value = el(`#filter_value_${col}`).value = null
+    }
+
+    el(`#filter2_value1`).value = null
+    el(`#filter2_value2`).value = null
+
+    el(`#filter_value_id`).value = null
+    getAllData()
+  }
+  
+  function reloadData () {
+    var columns = getColumnFillable()
+
+    var DataModel = new Model(tableName)
+    for (col of columns) {
+      var operator = el(`#filter_operator_${col}`).value
+      var value = el(`#filter_value_${col}`).value
+      if (value) DataModel.where(col, operator, value)
+    }
+
+    var valueId = el(`#filter_value_id`).value
+    if (valueId) DataModel.where('id', '=', valueId)
+
+    var colx = el(`#filter2_column`).value
+    var opr1 = el(`#filter2_operator1`).value
+    var opr2 = el(`#filter2_operator2`).value
+    var val1 = el(`#filter2_value1`).value
+    var val2 = el(`#filter2_value2`).value
+    if (val1 && val2) {
+      DataModel.where(colx, opr1, val1)
+      DataModel.where(colx, opr2, val2)
+    }
+
+    const data = DataModel.get()
+    console.log('DataModel', DataModel)
+    console.log('query', data)
+    getAllData(data, true)
+  }
+
+  function getAllData (customList = [], outsource = false) {
+    var list = customList.length ? customList : DataModel.get()
+    if (outsource) list = customList
+    // console.log('getAllData', list)
+
+    // make header column
+    var columns = getColumnFillable()
+    var thead = ''
+    thead += `<th>#</th>`
+    thead += `<th>ID</th>`
+    for (col of columns) {
+      thead += `<th>${col}</th>`
+    }
+    thead = `<tr>${thead}</tr>`
+    el('#tableHead').innerHTML = thead
+
+    // make table row data 
+    var tbody = ''
+    for (row of list) {
+      let td = ''
+      td += `<td>
+        <button data-bs-toggle="modal" data-bs-target="#editModal" onClick="editData('${row.id}')" class="btn btn-sm btn-success">Edit</button>
+        <button onClick="deleteData('${row.id}')" class="btn btn-sm btn-danger">Delete</button>
+        </td>`
+      td += `<td>${row.id}</td>`
+      for (col of columns) {
+        td += `<td>${row[col]}</td>`
+      }
+      tbody += `<tr>${td}</tr>`
+    }
+    el('#tableData').innerHTML = tbody
+  }
+
+  function makeColumnHead(name) {
+    return `<td>`
+  }
+
+  function store () {
+    var data = getObjectFromTable()
+    var result = DataModel.save(data)
+    console.log('saving into :',tableName, result)
+    el('#ldbStoreLog').innerHTML = JSON.stringify(result)
+    getAllData()
+  }
+
+  // preparation form edit & inject data
+  function editData (id) {
+    var data = new Model(tableName).find(id)
+    console.log('edit', data)
+    var input = ''
+    for (k in data) {
+      if (k !== 'id') {
+        input += `<div class="mb-3">
+          <label class="form-label fw-bold">${k}</label>
+          <input id="form_col_${k}" class="form-control" value="${data[k]}">
+        </div>`
+      } else input += `<input type="hidden" id="form_col_${k}" class="form-control" value="${data[k]}">`
+    }
+
+    el('#editId').innerHTML = data.id
+    el('#columnEdit').innerHTML = input
+
+  }
+ 
+  // commit changes data
+  function updateData () {
+    var id = el(`#form_col_id`).value || null
+    let DataModel = new Model(tableName)
+    var data = DataModel.find(id) 
+    for (k in data) {
+      data[k] = el(`#form_col_${k}`).value || null
+    }
+    console.log('saving', data)
+    console.log('DM', DataModel)
+    DataModel.update(data)
+    getAllData()
+    el('#closeModal').click()
+    alert('Data updated!')
+  }
+
+  function deleteData (id) {
+    console.log('deleteData', id)
+    if (confirm('Are you sure want to delete this data ?')) {
+      let DataModel = new Model(tableName)
+      DataModel.delete(id)
+      getAllData()
+    }
+  }
+</script>
+     
+</body>
+</html>
