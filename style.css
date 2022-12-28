@@ -8,6 +8,16 @@
     min-height: 120px;
 }
 
+.code {
+    font-size: 14px;
+    font-family: 'Consolas';
+    background: #ececec;
+    color: rgb(66, 34, 34);
+    border-radius: 4px;
+    padding-top: 20px;
+    padding-bottom: 1px;
+}
+
 .logo {
     background: rgb(51,0,113);
     background: linear-gradient(45deg, rgba(51,0,113,1) 0%, rgba(36,14,176,1) 60%, rgba(0,212,255,1) 100%);
