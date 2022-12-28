@@ -25,3 +25,20 @@
     padding: 2px 13px 2px 13px;
     border-radius: 3px;
 }
+
+pre {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    overflow: auto;
+    font-size: .875em;
+    background: #f8f8f8;
+    padding: 5px;
+    font-weight: bold;
+    font-family: 'Consolas';
+}
+
+.hljs-keyword {
+    color: #d61b9f;
+    opacity: 1;
+}

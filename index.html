@@ -227,60 +227,48 @@
 
     <!-- API -->
     <div class="row">
-      <div class="col-sm-12">
-        <h4 class="fw-bold">Usages</h4>
-        <p>There are 2 Class functional in this plugin <b>DB</b> and <b>Model</b></p>
+      <div class="col-sm-12 mb-4">
+        <h4 class="fw-bold text-primary">Usages</h4>
       </div>
       <div class="col-sm-12">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">DB</th>
-              <th scope="col">Model</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>All about of usage localstorage</td>
-              <td>@mdo</td>
-            </tr>
-          </tbody>
+<p><strong>Get All Data</strong></p>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">var</span> list = UserModel.<span class="hljs-keyword">get</span>()
+</code></pre><hr>
+<p><strong>Get Some Data</strong></p>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'name'</span>, <span class="hljs-string">'ikhbalfuady'</span>).<span class="hljs-keyword">get</span>()
+
+<span class="hljs-comment">// Multiple selection where</span>
+<span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&gt;='</span> <span class="hljs-number">18</span>)
+           .<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&lt;='</span>, <span class="hljs-number">25</span>)
+           .<span class="hljs-keyword">get</span>()
+</code></pre><hr>
+<p><strong>Store Data</strong></p>
+<pre><code><span class="hljs-title">const</span> <span class="hljs-type">UserModel</span> = new <span class="hljs-type">Model</span>('users')
+<span class="hljs-title">let</span> <span class="hljs-class"><span class="hljs-keyword">data</span> = {
+  <span class="hljs-title">name</span>: "<span class="hljs-type">John</span>",
+  <span class="hljs-title">age</span>: 21
+}</span>
+
+<span class="hljs-type">UserModel</span>.save(<span class="hljs-class"><span class="hljs-keyword">data</span>)</span>
+</code></pre><hr>
+<p><strong>Update Data</strong></p>
+<pre><code>const UserModel = new Model(<span class="hljs-string">'users'</span>)
+let <span class="hljs-keyword">data</span> = UserModel.find(id)
+<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">data</span>) throw error(`user <span class="hljs-keyword">with</span> id<span class="hljs-string">"${id}"</span> <span class="hljs-built_in">not</span> found `)
+
+<span class="hljs-comment">// set value into object</span>
+<span class="hljs-keyword">data</span>.<span class="hljs-keyword">name</span> = <span class="hljs-string">"Ikhbalfuady"</span>
+UserModel.save(<span class="hljs-keyword">data</span>)
+</code></pre><hr>
+<p><strong>Delete Data</strong></p>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+UserModel.<span class="hljs-keyword">delete</span>(id)
+</code></pre>
         
-        </table>
       </div>
 
-      <div class="col-sm-12">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td colspan="2">Larry the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </tbody>
-        
-          </table>
-      </div>
     </div>
   </main>
 
