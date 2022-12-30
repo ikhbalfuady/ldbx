@@ -32,7 +32,7 @@
 
     
     <!-- Custom styles for this template -->
-    <link href="style.css" rel="stylesheet">
+    <link href="style.css?v=1.0.1" rel="stylesheet">
   </head>
 <body>
 
@@ -278,7 +278,7 @@ UserModel.update(<span class="hljs-keyword">data</span>)
 <p><strong>Delete Data</strong></p>
 <pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
 UserModel.<span class="hljs-keyword">delete</span>(id)
-</code></pre><h1 id="avail-operator">Avail Operator</h1>
+</code></pre><h3 class="mb-3 mt-3 text-primary fw-bold" id="avail-operator">Avail Operator</h1>
 <table>
 <thead>
 <tr>
@@ -340,18 +340,66 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
 <tr>
 <td>IN</td>
 <td>IN</td>
-<td>.where(&#39;key&#39;, &#39;IN&#39;, arrayValue) // arrayValue = [1,2,3] </td>
+<td>.where(&#39;key&#39;, &#39;IN&#39;, arrayValue)  // arrayValue =  [1,2,3]</td>
 <td>READY</td>
 </tr>
 <tr>
 <td>NOT IN</td>
 <td>NIN</td>
-<td>.where(&#39;key&#39;, &#39;NIN&#39;, arrayValue) // arrayValue = [1,2,3] </td>
+<td>.where(&#39;key&#39;, &#39;NIN&#39;, arrayValue)  // arrayValue =  [1,2,3]</td>
 <td>READY</td>
 </tr>
 </tbody>
 </table>
+<hr>
+<h3 class="fw-bold text-primary mb-3 mt-4" id="other-features">Other Features</h1>
+<p><strong>orderBy(key, type?)</strong></p>
+<p>this is method chaining to implementing &quot;order data&quot; of result query \</p>
+<ul>
+<li>key : object key</li>
+<li>type : asc / desc (default : asc)</li>
+</ul>
+<pre><code><span class="hljs-selector-class">.orderBy</span>(<span class="hljs-string">'key'</span>) <span class="hljs-comment">// order ASC</span>
+<span class="hljs-selector-class">.orderBy</span>(<span class="hljs-string">'key'</span>, <span class="hljs-string">'desc'</span>) <span class="hljs-comment">// order DESC</span>
+</code></pre><ul>
+<li>Atenttion : order can only be executed once per query, even if you add multiple &#39;orderBy&#39;, the last &#39;orderBy&#39; is recognized</li>
+</ul>
+<hr>
+<p><strong>belongsTo(tableName, foreignKey, newObjectName?, targetKey?)</strong></p>
+<p>this is method chaining to implementing relation of some data \
+this method will be created new single object for every object result data \</p>
+<ul>
+<li>tableName : name of table</li>
+<li>foreignKey : foreign key object, ex : role_id</li>
+<li>newObjectName : object name for the relation , ex : role</li>
+<li>targetKey : target key object of source data, default is &quot;id&quot;</li>
+</ul>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
+.belongsTo(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'role'</span>) <span class="hljs-comment">// simply version</span>
+.first()
 
+<span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
+.belongsTo(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenue'</span>, <span class="hljs-string">'code'</span>) <span class="hljs-comment">// full version</span>
+.<span class="hljs-keyword">get</span>()
+</code></pre>
+<hr>
+<p><strong>hasMany(tableName, foreignKey, newObjectName?, targetKey?)</strong></p>
+<p>this is method chaining to implementing relation of some data \
+this method will be created new single object for every object result data \</p>
+<ul>
+<li>tableName : name of table</li>
+<li>foreignKey : foreign key object, ex : role_id</li>
+<li>newObjectName : object name for the relation , ex : role</li>
+<li>targetKey : target key object of source data, default is &quot;id&quot;</li>
+</ul>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
+.hasMany(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'roles'</span>) <span class="hljs-comment">// simply version</span>
+.first()
+
+<span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
+.hasMany(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenues'</span>, <span class="hljs-string">'code'</span>) <span class="hljs-comment">// full version</span>
+.<span class="hljs-keyword">get</span>()
+</code></pre>
         <!-- End -->
       </div>
 
@@ -368,7 +416,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
   </footer>
 </div>
 
-<script src="ldbx.js"></script>
+<script src="ldbx.js?v=1.1.4"></script>
 <script>
 
   let counter = 4;

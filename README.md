@@ -106,3 +106,69 @@ UserModel.delete(id)
 | Is NOT NULL        | NN / nn | .where('key', 'NN', value) OR .where('key', 'nn', value)  | READY       |
 | IN                 | IN      | .where('key', 'IN', arrayValue)  // arrayValue =  [1,2,3] | READY       |
 | NOT IN             | NIN     | .where('key', 'NIN', arrayValue)  // arrayValue =  [1,2,3]| READY       |
+
+___
+
+# Other Features
+
+**orderBy(key, type?)**
+
+this is method chaining to implementing "order data" of result query \
+- key : object key
+- type : asc / desc (default : asc)
+
+```
+.orderBy('key') // order ASC
+.orderBy('key', 'desc') // order DESC
+
+```
+
+* Atenttion : order can only be executed once per query, even if you add multiple 'orderBy', the last 'orderBy' is recognized
+
+___
+
+**belongsTo(tableName, foreignKey, newObjectName?, targetKey?)**
+
+this is method chaining to implementing relation of some data \
+this method will be created new single object for every object result data \
+
+- tableName : name of table
+- foreignKey : foreign key object, ex : role_id
+- newObjectName : object name for the relation , ex : role
+- targetKey : target key object of source data, default is "id"
+
+
+```
+var UserModel = new Model('users')
+.belongsTo('roles', 'role_id', 'role') // simply version
+.first()
+
+var UserModel = new Model('users')
+.belongsTo('coa', 'coa_revenue_code', 'coa_revenue', 'code') // full version
+.get()
+
+```
+
+___
+
+**hasMany(tableName, foreignKey, newObjectName?, targetKey?)**
+
+this is method chaining to implementing relation of some data \
+this method will be created new single object for every object result data \
+
+- tableName : name of table
+- foreignKey : foreign key object, ex : role_id
+- newObjectName : object name for the relation , ex : role
+- targetKey : target key object of source data, default is "id"
+
+
+```
+var UserModel = new Model('users')
+.hasMany('roles', 'role_id', 'roles') // simply version
+.first()
+
+var UserModel = new Model('users')
+.hasMany('coa', 'coa_revenue_code', 'coa_revenues', 'code') // full version
+.get()
+
+```

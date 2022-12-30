@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<script src="ldbx.js"></script>
+<script>
+
+var GenderModel = new Model('genders')
+var genders = [
+  {id: '1', code: 'M', name: 'male'},
+  {id: '2', code: 'F', name: 'femlae'},
+]
+genders.map(gender => {
+  if (!GenderModel.get().length) GenderModel.save(gender)
+})
+var genderList = GenderModel.get()
+
+var PetModel = new Model('pets')
+var pets = [
+  {id: '1', code: 'DG', name: 'DOG'},
+  {id: '2', code: 'BD', name: 'BIRD'},
+  {id: '3', code: 'BD', name: 'LOCNESS'},
+]
+pets.map(pet => {
+  if (!PetModel.get().length) PetModel.save(pet)
+})
+var petList = PetModel.get()
+
+var UsersModel = new Model('users')
+								.belongsTo(GenderModel.tableName, 'gender_id', 'gender')
+								.belongsTo(PetModel.tableName, 'pet_id', 'pet')
+								.hasMany(PetModel.tableName, 'pet_code', 'pets', 'code')
+								
+UsersModel.fixStructure(['id', 'name', 'born_date', 'iq', 'is_alive', 'gender_id', 'pet_id', 'pet_code'])
+
+var list = UsersModel.get()
+
+list.map(user => {
+  if (user.iq === 120) {
+    user.gender_id = '1'
+    user.pet_id = '1'
+    user.pet_code = 'BD'
+  }
+  else {
+    user.gender_id = '2'
+    user.pet_id = '2'
+    user.pet_code = 'DG'
+  }
+  let Usm = new Model('users').where('id', user.id).update(user)
+})
+
+function init () {
+  console.log(UsersModel.belongsToRelation)
+  console.table(list)
+  console.table(genderList)
+  console.table(petList)
+}
+
+init()
+  
+</script>
+
+</body>
+</html>

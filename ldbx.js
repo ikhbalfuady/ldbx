@@ -1,4 +1,4 @@
-/* LDBX Version 1.0.1
+/* LDBX Version 1.1.4
 Author : ikhbalfuady@gmail.com
 This some utilities script to help you manage localStorage data
 the style syntax similary like laravel eloquent to help you easy to understod the query
@@ -70,14 +70,46 @@ class DB {
 /* Eloquent */
 class Model {
   constructor(tableName = null, showLog = true) {
-    this.showLog = showLog
-    this.tableName = tableName
+    this.showLog = showLog // log performance
+    this.tableName = tableName // localstorage key name
+
+    /* whereCondition : arrayObject
+      N   : IS NULL
+      NN  : NOT NULL
+      NIN : NOT IN
+      {
+        key     : String,
+        operator: Enum(=, >, >=, <, <, like, N, NN, IN, NIN)
+        value   : String,Number,
+      }
+    */
     this.whereCondition = []
+
+    /* orderCondition : arrayObject
+      {
+        key   : String,
+        type  : Enum('asc','desc),
+      }
+    */
     this.orderCondition = []
+
+    /* belongsToRelation & hasManyRelation : arrayObject
+      {
+        tableName     : String,
+        foreignKey    : String,
+        newObjectName : String,
+        targetKey     : String
+      }
+    */
+    this.belongsToRelation = []
+    this.hasManyRelation = []
+
+    /* LocalStorage Instance */
     this.DB = new DB()
   }
 
-  UUID(separator = '') {
+  // Utilities
+  UUID (separator = '') {
     var rand = Math.random
 
     var nbr, randStr = ""
@@ -118,35 +150,65 @@ class Model {
     }
   }
 
-  /* criteria <array:object> : [
-      {
-        key: 'keyName',
-        operator: '=', // =, >, >=, <, <=, like
-        value: 'value',
-      }
-    ]
+  /* 
+    fillableColumns : ['id', 'name', 'code']
   */
-  _get (tableName, criteria = null) {
+  fixStructure (fillableColumns) {
+    var data = this.fetch(this.tableName) || [];
+    const hasId = fillableColumns.includes('id');
+    if (!hasId) fillableColumns.push('id');
+  
+    data = data.map(row => {
+      const fixRow = {};
+      fillableColumns.forEach(col => {
+        fixRow[col] = row[col] || null;
+      });
+      return fixRow;
+    });
+
+    this.DB.save(this.tableName, data) // commiting
+    console.info(`Success updating structure [${this.tableName}]`, fillableColumns, data)
+  }
+
+  /* criteria = whereCondition */
+  fetch (tableName, criteria = [], tag = '') {
     const start = performance.now()
     var table = this.DB.get(tableName)
     var data = null
     if (table) {
-      if (criteria) data = this.query(table, criteria)
+      if (criteria.length) data = this.query(table, criteria)
       else data = table
     }
 
     if (this.orderCondition.length) {
       for (let order of this.orderCondition) {
-        data = data.sort(this.compareValues(order.key, order.type))
+        data = this.sortBy(data, order.key, order.type)
       }
     }
 
     const end = performance.now()
-    this.console(`Query '${tableName}' Execution time: ${end - start} ms`, 'info')
+    this.console(`${tag} Query ${data.length} of '${tableName}' Execution time: ${end - start} ms`, 'info')
     return data
   }
 
-  operator(operator, value, valueComparison) {
+  sortBy(data, key, order = 'asc') {
+    return data.sort((a, b) => {
+      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
+      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
+      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
+    });
+  }
+
+  compareValues (key, order = 'asc') {
+    return function(a, b) {
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) return 0;
+      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
+      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
+      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
+    };
+  }
+
+  operator (operator, value, valueComparison) {
     var res = false
     if (operator === '=' && value === valueComparison) res = true
     if (operator === '>' && value > valueComparison) res = true
@@ -161,7 +223,7 @@ class Model {
     return res
   }
 
-  query (data, criteria = null) {
+  query (data, criteria = []) {
     var countWhere = criteria ? criteria.length : 0
     if (countWhere === 0) return data
     var res = []
@@ -176,46 +238,12 @@ class Model {
       }
       if (match === countWhere) res.push(val)
     }
-    this.queryLog(data, totalChecked)
+    // console.info(`querying ${totalChecked} of ${data.length} data`)
     return res
   }
 
-  _query (data, criteria = null) {
-    
-    var countWhere = criteria ? criteria.length : 0
-    if (countWhere === 0) return data
-    var res = []
-    var totalChecked = 0
-    for (let val of data) {
-      totalChecked = totalChecked + 1
-      var match = 0
-
-      for (let where of criteria) {
-        var colVal = val[where.key]
-        if (this.operator(where.operator, colVal, where.value)) match = match + 1
-      }
-
-      if (match === countWhere) res.push(val)
-      
-    }
-    this.queryLog(data, totalChecked)
-    return res
-  }
-
-  queryLog(data, totalChecked) {    
-    console.info(`querying ${totalChecked} of ${data.length} data`)
-  }
-
-  compareValues(key, order = 'asc') {
-    return function(a, b) {
-      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) return 0;
-      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
-      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
-      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
-    };
-  }
-
-  orderBy(key, type = 'asc') {
+  // chain
+  orderBy (key, type = 'asc') {
     this.orderCondition.push({ key: key, type: type})
     return this
   }
@@ -236,13 +264,62 @@ class Model {
     return this
   }
 
-  get() {
-    var data = this._get(this.tableName, this.whereCondition)
+  // relations
+  collectRelation (data) {
+    return data.map( obj => {
+      if (this.belongsToRelation.length) obj = this.getRelation(obj, 'belongsTo')
+      if (this.hasManyRelation.length) obj = this.getRelation(obj, 'hasMany')
+      return obj
+    })
+  }
+
+  getRelation(obj, type = 'belongsTo') {
+    var relationMapName = `${type}Relation` 
+    // if (!this[relationMapName]) return obj
+
+    this[relationMapName].map(rel => {
+      let objRel = this.fetch(rel.tableName, [{key: rel.targetKey, operator: '=', value: obj[rel.foreignKey]}])
+      // console.info(`${type} ${rel.tableName} WHERE ${rel.targetKey} = ${obj[rel.foreignKey]}`)
+      if (objRel && objRel.length) {
+        if (type === 'belongsTo') obj[rel.newObjectName] = objRel[0]
+        if (type === 'hasMany') obj[rel.newObjectName] = objRel
+      }
+    })
+    return obj
+  }
+
+  belongsTo(tableName, foreignKey, newObjectName, targetKey = 'id') {
+    var criteria = {
+      tableName,
+      foreignKey,
+      newObjectName,
+      targetKey
+    }
+    this.belongsToRelation.push(criteria)
+    return this
+  }
+
+  hasMany(tableName, foreignKey, newObjectName, targetKey = 'id') {
+    var criteria = {
+      tableName,
+      foreignKey,
+      newObjectName,
+      targetKey
+    }
+    this.hasManyRelation.push(criteria)
+    return this
+  }
+
+  // trigger
+  get () {
+    var data = this.fetch(this.tableName, this.whereCondition)
+    data = this.collectRelation(data)
     return data
   }
 
-  first() {
-    var data = this._get(this.tableName, this.whereCondition)
+  first () {
+    var data = this.fetch(this.tableName, this.whereCondition)
+    data = this.collectRelation(data)
     return data.length ? data[0] : null 
   }
 
@@ -250,23 +327,10 @@ class Model {
     return this.where('id', id).first()
   }
 
-  fixStructure(structure) {
-    const data = this._get(this.tableName) || [];
-    const hasId = structure.includes('id');
-    if (!hasId) structure.push('id');
-  
-    return data.map(row => {
-      const fixRow = {};
-      structure.forEach(col => {
-        fixRow[col] = row[col] || null;
-      });
-      return fixRow;
-    });
-  }
-
   // commiting
   save (data) {
-    const id = this.UUID()
+    let id = this.UUID()
+    if (data.id) id = data.id
     const table = this.DB.get(this.tableName)
     const db = table ? [...table, { ...data, id }] : [{ ...data, id }] // merging 
     this.DB.save(this.tableName, db) // commiting
@@ -275,7 +339,7 @@ class Model {
   }
 
   update (data) {
-    var db = this._get(this.tableName, [])
+    var db = this.fetch(this.tableName, [])
     const index = db.findIndex(item => item.id === data.id);
     if (index >= 0) {
       db[index] = data
@@ -295,7 +359,7 @@ class Model {
   }
 
   delete (id) {
-    var db = this._get(this.tableName, [])
+    var db = this.fetch(this.tableName, [])
     const index = db.findIndex(item => item.id === id);
     if (index >= 0) {
       // commiting
