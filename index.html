@@ -231,19 +231,35 @@
       <div class="col-sm-12 mb-4">
         <h4 class="fw-bold text-primary">Usages</h4>
       </div>
-      <div class="col-sm-12">
+      <div class="col-sm-12 docx">
+        <!-- Start -->
+<h1 id="ldbx">LDBX</h1>
+<p>Javascript Library for data management using localStorage with laravel eloquent syntax,
+Create, Read, Update, Delete and Truncate has avail in this lib.</p>
+<p>Demo : <a href="https://ldbx.sopeus.com">LDXB Demo</a></p>
+<h1 id="usage">Usage</h1>
 <p><strong>Get All Data</strong></p>
 <pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> list = UserModel.<span class="hljs-keyword">get</span>()
 </code></pre><hr>
-<p><strong>Get Some Data</strong></p>
+<p><strong>Get first / single data</strong></p>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'id'</span>, id).first()
+</code></pre><hr>
+<p><strong>Single selection where</strong></p>
 <pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'name'</span>, <span class="hljs-string">'ikhbalfuady'</span>).<span class="hljs-keyword">get</span>()
-
-<span class="hljs-comment">// Multiple selection where</span>
+</code></pre><hr>
+<p><strong>Multiple selection where</strong></p>
+<pre><code><span class="hljs-comment">// using custom operator</span>
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&gt;='</span> <span class="hljs-number">18</span>)
-           .<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&lt;='</span>, <span class="hljs-number">25</span>)
-           .<span class="hljs-keyword">get</span>()
+            .<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&lt;='</span>, <span class="hljs-number">25</span>)
+            .<span class="hljs-keyword">get</span>()
+</code></pre><hr>
+<p><strong>Find by id</strong></p>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">var</span> data = UserModel.find(id)
 </code></pre><hr>
 <p><strong>Store Data</strong></p>
 <pre><code><span class="hljs-title">const</span> <span class="hljs-type">UserModel</span> = new <span class="hljs-type">Model</span>('users')
@@ -261,13 +277,86 @@ let <span class="hljs-keyword">data</span> = UserModel.find(id)
 
 <span class="hljs-comment">// set value into object</span>
 <span class="hljs-keyword">data</span>.<span class="hljs-keyword">name</span> = <span class="hljs-string">"Ikhbalfuady"</span>
-UserModel.save(<span class="hljs-keyword">data</span>)
+UserModel.update(<span class="hljs-keyword">data</span>)
 </code></pre><hr>
 <p><strong>Delete Data</strong></p>
 <pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
 UserModel.<span class="hljs-keyword">delete</span>(id)
-</code></pre>
-        
+</code></pre><h1 id="avail-operator">Avail Operator</h1>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>value</th>
+<th>Syntax</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Equal</td>
+<td>=</td>
+<td>.where(&#39;key&#39;, &#39;=&#39;, value) OR .where(&#39;key&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Like / Contains</td>
+<td>like</td>
+<td>.where(&#39;key&#39;, &#39;like&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Less Than</td>
+<td>&lt;</td>
+<td>.where(&#39;key&#39;, &#39;&lt;&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Less Than Equal</td>
+<td>&lt;=</td>
+<td>.where(&#39;key&#39;, &#39;&lt;=&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Greater Than</td>
+<td>&gt;</td>
+<td>.where(&#39;key&#39;, &#39;&gt;&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Greater Than Equal</td>
+<td>&gt;=</td>
+<td>.where(&#39;key&#39;, &#39;&gt;=&#39;, value)</td>
+<td>READY</td>
+</tr>
+<tr>
+<td>Is NULL</td>
+<td>N/n</td>
+<td>.where(&#39;key&#39;, &#39;N&#39;, value) OR .where(&#39;key&#39;, &#39;n&#39;, value)</td>
+<td>COMING SOON</td>
+</tr>
+<tr>
+<td>Is NOT NULL</td>
+<td>NN / nn</td>
+<td>.where(&#39;key&#39;, &#39;NN&#39;, value) OR .where(&#39;key&#39;, &#39;nn&#39;, value)</td>
+<td>COMING SOON</td>
+</tr>
+<tr>
+<td>IN</td>
+<td>IN</td>
+<td>.where(&#39;key&#39;, &#39;IN&#39;, arrayValue)</td>
+<td>COMING SOON</td>
+</tr>
+<tr>
+<td>NOT IN</td>
+<td>NIN</td>
+<td>.where(&#39;key&#39;, &#39;NIN&#39;, arrayValue)</td>
+<td>COMING SOON</td>
+</tr>
+</tbody>
+</table>
+
+        <!-- End -->
       </div>
 
     </div>
@@ -388,6 +477,8 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
       res += `.where('${colx}', '${opr1}', '${val1}').where('${colx}', '${opr2}', '${val2}') \n`
     }
 
+    res = `${res}.get()`
+
     el(`#filterDisplay`).innerHTML = res
   }
 
@@ -407,7 +498,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
       filterList += `
         <div class="mb-3 row">
         <div class="col-sm-2 col-form-label fw-bold ">${col}</div>
-        <div class="col-sm-5">
+        <div class="col-6 col-sm-5">
           <select onChange="getFilterDisplay()" class="form-control" id="filter_operator_${col}">
             <option value="=">Equal (=)</option>
             <option value="like">Contains (like)</option>
@@ -417,7 +508,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
             <option value="<=">Less Than Equal(<=)</option>
           </select>
         </div>
-        <div class="col-sm-5">
+        <div class="col-6 col-sm-5">
           <input onChange="getFilterDisplay()" class="form-control" id="filter_value_${col}">
         </div>
       </div>
@@ -443,7 +534,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
          ${colOpt}
         </select>
       </div>
-      <div class="col-sm-3">
+      <div class="mb-3 col-6 col-sm-3">
         <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator1">
           <option value="=">Equal (=)</option>
           <option value="like">Contains (like)</option>
@@ -453,10 +544,10 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
           <option value="<=">Less Than Equal(<=)</option>
         </select>
       </div>
-      <div class="col-sm-3">
+      <div class="mb-3 col-6 col-sm-3">
         <input onChange="getFilterDisplay()" class="form-control" id="filter2_value1">
       </div>
-      <div class="col-sm-3">
+      <div class="mb-3 col-6 col-sm-3">
         <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator2">
           <option value="=">Equal (=)</option>
           <option value="like">Contains (like)</option>
@@ -466,7 +557,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
           <option value="<=">Less Than Equal(<=)</option>
         </select>
       </div>
-      <div class="col-sm-3">
+      <div class="mb-3 col-6 col-sm-3">
         <input onChange="getFilterDisplay()" class="form-control" id="filter2_value2">
       </div>
     </div>
@@ -497,7 +588,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
       {"name":"George","born_date":"2000-06-24","iq":130,"is_alive":'false'},
     ]
 
-    var list = DataModel.get()
+    var list = DataModel.get() || []
 
     if (list && !list.length) {
     
@@ -583,19 +674,21 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
 
     // make table row data 
     var tbody = ''
-    for (row of list) {
-      let td = ''
-      td += `<td>
-        <button data-bs-toggle="modal" data-bs-target="#editModal" onClick="editData('${row.id}')" class="btn btn-sm btn-success">Edit</button>
-        <button onClick="deleteData('${row.id}')" class="btn btn-sm btn-danger">Delete</button>
-        </td>`
-      td += `<td>${row.id}</td>`
-      for (col of columns) {
-        td += `<td>${row[col]}</td>`
+    if (list) {
+      for (row of list) {
+        let td = ''
+        td += `<td>
+          <button data-bs-toggle="modal" data-bs-target="#editModal" onClick="editData('${row.id}')" class="btn btn-sm btn-success">Edit</button>
+          <button onClick="deleteData('${row.id}')" class="btn btn-sm btn-danger">Delete</button>
+          </td>`
+        td += `<td>${row.id}</td>`
+        for (col of columns) {
+          td += `<td>${row[col]}</td>`
+        }
+        tbody += `<tr>${td}</tr>`
       }
-      tbody += `<tr>${td}</tr>`
+      el('#tableData').innerHTML = tbody
     }
-    el('#tableData').innerHTML = tbody
   }
 
   function makeColumnHead(name) {

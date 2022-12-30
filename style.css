@@ -42,3 +42,66 @@ pre {
     color: #d61b9f;
     opacity: 1;
 }
+
+
+.docx table {
+    border: 1px solid #1C6EA4;
+    background-color: #EEEEEE;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+.docx table td,
+.docx table th {
+    border: 1px solid #AAAAAA;
+    padding: 13px 12px;
+}
+
+.docx table tbody td {
+    font-size: 13px;
+}
+
+.docx table thead {
+    background: #1C6EA4;
+    border-bottom: 2px solid #444444;
+}
+
+.docx table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+    border-left: 2px solid #D0E4F5;
+}
+
+.docx table thead th:first-child {
+    border-left: none;
+}
+
+.docx table tfoot {
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFFFFF;
+    background: #D0E4F5;
+    background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+    border-top: 2px solid #444444;
+}
+
+.docx table tfoot td {
+    font-size: 14px;
+}
+
+.docx table tfoot .links {
+    text-align: right;
+}
+
+.docx table tfoot .links a {
+    display: inline-block;
+    background: #1C6EA4;
+    color: #FFFFFF;
+    padding: 2px 8px;
+    border-radius: 5px;
+}

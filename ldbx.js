@@ -8,10 +8,6 @@ avail to save, update, delete, get all & get single
 /* LocalStorage Helper */
 class DB {
   constructor() {
-    this.init()
-  }
-
-  init () {
     if (typeof(Storage) !== "undefined") {
       // console.log('LocalStorage initialize')
       return true
@@ -36,7 +32,7 @@ class DB {
     return val
   }
 
-  getter (key, val) {
+  _formater (val) {
     var data = val
     if (!data) {
       console.warn('failed extract data', data)
@@ -57,13 +53,26 @@ class DB {
     } 
   }
 
+  formater(val) {
+    if (!val) {
+      console.warn('failed to extract data', val)
+      return null
+    }
+  
+    const [format, value] = val.split("|");
+    if (format === 'obj') return JSON.parse(value);
+    if (format === 'num') return parseFloat(value);
+    if (format === 'bol') return value === 'true';
+    return value;
+  }
+
   save (key, value) {
     localStorage.setItem(key, this.setter(value))
   }
 
   get (key) {
     var val = localStorage.getItem(key)
-    val = this.getter(key, val)
+    val = this.formater(val)
     return val
   }
 
@@ -188,28 +197,13 @@ class Model {
   queryLog(data, totalChecked) {    
     console.info(`querying ${totalChecked} of ${data.length} data`)
   }
-  
+
   compareValues(key, order = 'asc') {
-    return function innerSort(a, b) {
-      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
-        // property doesn't exist on either object
-        return 0;
-      }
-
-      const varA = (typeof a[key] === 'string')
-        ? a[key].toUpperCase() : a[key];
-      const varB = (typeof b[key] === 'string')
-        ? b[key].toUpperCase() : b[key];
-
-      let comparison = 0;
-      if (varA > varB) {
-        comparison = 1;
-      } else if (varA < varB) {
-        comparison = -1;
-      }
-      return (
-        (order === 'desc') ? (comparison * -1) : comparison
-      );
+    return function(a, b) {
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) return 0;
+      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
+      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
+      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
     };
   }
 
@@ -242,55 +236,38 @@ class Model {
     return this.where('id', id).first()
   }
 
-  fixStructure (structure) {
-    var data = this._get(this.tableName) || []
-    var hasId = structure.includes('id')
-    if (!hasId) structure.push('id')
-
-    var fixdata = []
-    for (let row of data) {
-      var fixRow = {}
-      for (let i in structure) {
-        var col = structure[i]
-        var colVal = row[col]
-        fixRow[col] = colVal ? colVal : null
-      }
-      fixdata.push(fixRow)
-    }
-
-    this.DB.save(this.tableName, fixdata)
-    return fixdata
+  fixStructure(structure) {
+    const data = this._get(this.tableName) || [];
+    const hasId = structure.includes('id');
+    if (!hasId) structure.push('id');
+  
+    return data.map(row => {
+      const fixRow = {};
+      structure.forEach(col => {
+        fixRow[col] = row[col] || null;
+      });
+      return fixRow;
+    });
   }
 
   // commiting
   save (data) {
-    data.id = this.UUID()
-    var table = this.DB.get(this.tableName)
-    var db = []
-    // merging
-    if (!table) db.push(data)
-    else {
-      db = table
-      db.push(data)
-    }
-    // commiting
-    this.DB.save(this.tableName, db)
-    this.console(`Succes saving [${this.tableName}]`, 'success')
-    return data
-
+    const id = this.UUID()
+    const table = this.DB.get(this.tableName)
+    const db = table ? [...table, { ...data, id }] : [{ ...data, id }] // merging 
+    this.DB.save(this.tableName, db) // commiting
+    this.console(`Success saving [${this.tableName}]`, 'success')
+    return { ...data, id }
   }
 
   update (data) {
     var db = this._get(this.tableName, [])
-
     const index = db.findIndex(item => item.id === data.id);
     if (index >= 0) {
       db[index] = data
-
       // commiting
       this.DB.save(this.tableName, db)
       this.console(`Succes updating [${this.tableName}]`, 'success')
-
       return data
     } else {
       this.console(`index of id [${data.id}] not found in data "${this.tableName}" `, 'danger')
@@ -305,20 +282,16 @@ class Model {
 
   delete (id) {
     var db = this._get(this.tableName, [])
-
     const index = db.findIndex(item => item.id === id);
     if (index >= 0) {
- 
       // commiting
       const newArr = db.slice(0, index).concat(db.slice(index + 1));
       this.DB.save(this.tableName, newArr)
       this.console(`Succes updating [${this.tableName}]`, 'success')
-
     } else {
       this.console(`index of id [${id}] not found in data "${this.tableName}" `, 'danger')
       return false
     }
-
   }
 
 }
