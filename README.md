@@ -1,3 +1,5 @@
+![logo]( https://ldbx.sopeus.com/logo.png)
+
 # LDBX
 Javascript Library for data management using localStorage with laravel eloquent syntax,
 Create, Read, Update, Delete and Truncate has avail in this lib.
