@@ -17,6 +17,13 @@ class DB {
     }
   }
 
+  valueFormater (val) {
+    if (val === 'true') return true
+    if (val === 'false') return false
+    if (!isNaN(val)) return Number(val)
+    return val
+  }
+
   getFormat (val) {
     var res = 'str'
     if (typeof(val) === 'number') res = 'num'
@@ -30,27 +37,6 @@ class DB {
     if (format == 'obj') data = JSON.stringify(data)
     var val = format + '|' + data
     return val
-  }
-
-  _formater (val) {
-    var data = val
-    if (!data) {
-      console.warn('failed extract data', data)
-      return null
-    }
-
-    var expl = data.split("|")
-    if (expl.length == 2) {
-      var format = expl[0]
-      var value = expl[1]
-      if (format == 'obj') value = JSON.parse(value)
-      if (format == 'num') value = parseFloat(value)
-      if (format == 'bol') {
-        if (value == 'true') value = true
-        else value = false
-      }
-      return value
-    } 
   }
 
   formater(val) {
@@ -160,19 +146,41 @@ class Model {
     return data
   }
 
-  operator(operator, value, valueComparartion) {
-    value = value ? value : ''
+  operator(operator, value, valueComparison) {
     var res = false
-    if (operator === '=' && value === valueComparartion) res = true
-    if (operator === '>' && value > valueComparartion) res = true
-    if (operator === '>=' && value >= valueComparartion) res = true
-    if (operator === '<' && value < valueComparartion) res = true
-    if (operator === '<=' && value <= valueComparartion) res = true
-    if (operator === 'like' && value.includes(valueComparartion)) res = true
+    if (operator === '=' && value === valueComparison) res = true
+    if (operator === '>' && value > valueComparison) res = true
+    if (operator === '>=' && value >= valueComparison) res = true
+    if (operator === '<' && value < valueComparison) res = true
+    if (operator === '<=' && value <= valueComparison) res = true
+    if (operator === 'like' && value.includes(valueComparison)) res = true
+		if (operator === 'N' && value === null) res = true // NULL
+    if (operator === 'NN' && value !== null) res = true // NOT NULL
+    if (Array.isArray(valueComparison) && operator === 'IN' && valueComparison.includes(value)) res = true // IN
+    if (Array.isArray(valueComparison) && operator === 'NIN' && !valueComparison.includes(value)) res = true // NOT IN
     return res
   }
 
   query (data, criteria = null) {
+    var countWhere = criteria ? criteria.length : 0
+    if (countWhere === 0) return data
+    var res = []
+    var totalChecked = 0
+    for (let val of data) {
+      totalChecked = totalChecked + 1
+      var match = 0
+      for (let where of criteria) {
+        var colVal = val[where.key]
+        var value = where.value ? where.value : null
+        if (this.operator(where.operator, colVal, value)) match = match + 1
+      }
+      if (match === countWhere) res.push(val)
+    }
+    this.queryLog(data, totalChecked)
+    return res
+  }
+
+  _query (data, criteria = null) {
     
     var countWhere = criteria ? criteria.length : 0
     if (countWhere === 0) return data
@@ -218,6 +226,12 @@ class Model {
       operator: value ? oprOrVal : '=',
       value: value ? value : oprOrVal,
     }
+
+    if (oprOrVal.toLowerCase() === 'n') criteria = { key: col, operator: 'N', value: null}
+    if (oprOrVal.toLowerCase() === 'nn') criteria = { key: col, operator: 'NN', value: null}
+    if (oprOrVal.toLowerCase() === 'in') criteria = { key: col, operator: 'IN', value: value}
+    if (oprOrVal.toLowerCase() === 'nin') criteria = { key: col, operator: 'NIN', value: value}
+
     this.whereCondition.push(criteria)
     return this
   }

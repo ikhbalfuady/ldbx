@@ -94,15 +94,15 @@ UserModel.delete(id)
 
 
 # Avail Operator
-| Name               | value   | Syntax                                                   | Status      |
-|--------------------|---------|----------------------------------------------------------|-------------|
-| Equal              | =       | .where('key', '=', value) OR .where('key', value)        | READY       |
-| Like / Contains    | like    | .where('key', 'like', value)                             | READY       |
-| Less Than          | <       | .where('key', '<', value)                                | READY       |
-| Less Than Equal    | <=      | .where('key', '<=', value)                               | READY       |
-| Greater Than       | >       | .where('key', '>', value)                                | READY       |
-| Greater Than Equal | >=      | .where('key', '>=', value)                               | READY       |
-| Is NULL            | N/n     | .where('key', 'N', value) OR .where('key', 'n', value)   | COMING SOON |
-| Is NOT NULL        | NN / nn | .where('key', 'NN', value) OR .where('key', 'nn', value) | COMING SOON |
-| IN                 | IN      | .where('key', 'IN', arrayValue)                          | COMING SOON |
-| NOT IN             | NIN     | .where('key', 'NIN', arrayValue)                         | COMING SOON |
+| Name               | value   | Syntax                                                    | Status      |
+|--------------------|---------|-----------------------------------------------------------|-------------|
+| Equal              | =       | .where('key', '=', value) OR .where('key', value)         | READY       |
+| Like / Contains    | like    | .where('key', 'like', value)                              | READY       |
+| Less Than          | <       | .where('key', '<', value)                                 | READY       |
+| Less Than Equal    | <=      | .where('key', '<=', value)                                | READY       |
+| Greater Than       | >       | .where('key', '>', value)                                 | READY       |
+| Greater Than Equal | >=      | .where('key', '>=', value)                                | READY       |
+| Is NULL            | N/n     | .where('key', 'N', value) OR .where('key', 'n', value)    | READY       |
+| Is NOT NULL        | NN / nn | .where('key', 'NN', value) OR .where('key', 'nn', value)  | READY       |
+| IN                 | IN      | .where('key', 'IN', arrayValue)  // arrayValue =  [1,2,3] | READY       |
+| NOT IN             | NIN     | .where('key', 'NIN', arrayValue)  // arrayValue =  [1,2,3]| READY       |

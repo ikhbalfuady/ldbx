@@ -178,6 +178,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <p class="text-danger">*Using coma separator for IN & NOT IN operator</p>
           <h4 class="fw-bold text-primary">Single Selector</h4>
           <div id="filterList"></div>
           <h4 class="fw-bold text-primary">Multiple Selector</h4>
@@ -328,25 +329,25 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
 <td>Is NULL</td>
 <td>N/n</td>
 <td>.where(&#39;key&#39;, &#39;N&#39;, value) OR .where(&#39;key&#39;, &#39;n&#39;, value)</td>
-<td>COMING SOON</td>
+<td>READY</td>
 </tr>
 <tr>
 <td>Is NOT NULL</td>
 <td>NN / nn</td>
 <td>.where(&#39;key&#39;, &#39;NN&#39;, value) OR .where(&#39;key&#39;, &#39;nn&#39;, value)</td>
-<td>COMING SOON</td>
+<td>READY</td>
 </tr>
 <tr>
 <td>IN</td>
 <td>IN</td>
-<td>.where(&#39;key&#39;, &#39;IN&#39;, arrayValue)</td>
-<td>COMING SOON</td>
+<td>.where(&#39;key&#39;, &#39;IN&#39;, arrayValue) // arrayValue = [1,2,3] </td>
+<td>READY</td>
 </tr>
 <tr>
 <td>NOT IN</td>
 <td>NIN</td>
-<td>.where(&#39;key&#39;, &#39;NIN&#39;, arrayValue)</td>
-<td>COMING SOON</td>
+<td>.where(&#39;key&#39;, &#39;NIN&#39;, arrayValue) // arrayValue = [1,2,3] </td>
+<td>READY</td>
 </tr>
 </tbody>
 </table>
@@ -373,6 +374,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
   let counter = 4;
     
   var tableName = document.querySelector('#tableName').value
+  var DBx = new DB();
   var DataModel = new Model(tableName)
   const objectModel = document.getElementById('objectModel');
   
@@ -452,6 +454,8 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
   function getFilterDisplay () {
     var columns = getColumnFillable()
 
+    var uniqueComparasion = ['N', 'NN']
+
     var res = 'var data = Model'
 
     var valueId = el(`#filter_value_id`).value
@@ -460,6 +464,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
     for (col of columns) {
       var operator = el(`#filter_operator_${col}`).value
       var value = el(`#filter_value_${col}`).value
+      if (uniqueComparasion.includes(operator)) res += `.where('${col}', '${operator}') \n`
       if (value) res += `.where('${col}', '${operator}', '${value}') \n`
     }
 
@@ -475,6 +480,21 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
     res = `${res}.get()`
 
     el(`#filterDisplay`).innerHTML = res
+  }
+
+  function getOperatorEl () {
+    return `
+    <option value="=">Equal (=)</option>
+    <option value="like">Contains (like)</option>
+    <option value=">">Greather Than (>)</option>
+    <option value=">=">Greather Than Equal(>=)</option>
+    <option value="<">Less Than(<)</option>
+    <option value="<=">Less Than Equal(<=)</option>
+    <option value="N">IS NULL (N)</option>
+    <option value="NN">NOT NULL (NN)</option>
+    <option value="IN">IN (IN)</option>
+    <option value="NIN">NOT IN (NIN)</option>
+    `
   }
 
   function getFilterList () {
@@ -495,12 +515,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
         <div class="col-sm-2 col-form-label fw-bold ">${col}</div>
         <div class="col-6 col-sm-5">
           <select onChange="getFilterDisplay()" class="form-control" id="filter_operator_${col}">
-            <option value="=">Equal (=)</option>
-            <option value="like">Contains (like)</option>
-            <option value=">">Greather Than (>)</option>
-            <option value=">=">Greather Than Equal(>=)</option>
-            <option value="<">Less Than(<)</option>
-            <option value="<=">Less Than Equal(<=)</option>
+            ${getOperatorEl()}
           </select>
         </div>
         <div class="col-6 col-sm-5">
@@ -531,12 +546,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
       </div>
       <div class="mb-3 col-6 col-sm-3">
         <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator1">
-          <option value="=">Equal (=)</option>
-          <option value="like">Contains (like)</option>
-          <option value=">">Greather Than (>)</option>
-          <option value=">=">Greather Than Equal(>=)</option>
-          <option value="<">Less Than(<)</option>
-          <option value="<=">Less Than Equal(<=)</option>
+          ${getOperatorEl()}
         </select>
       </div>
       <div class="mb-3 col-6 col-sm-3">
@@ -544,12 +554,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
       </div>
       <div class="mb-3 col-6 col-sm-3">
         <select onChange="getFilterDisplay()" class="form-control" id="filter2_operator2">
-          <option value="=">Equal (=)</option>
-          <option value="like">Contains (like)</option>
-          <option value=">">Greather Than (>)</option>
-          <option value=">=">Greather Than Equal(>=)</option>
-          <option value="<">Less Than(<)</option>
-          <option value="<=">Less Than Equal(<=)</option>
+          ${getOperatorEl()}
         </select>
       </div>
       <div class="mb-3 col-6 col-sm-3">
@@ -621,6 +626,19 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
     el(`#filter_value_id`).value = null
     getAllData()
   }
+
+  function handleInOperatorData (val, opr) {
+
+    var res = val
+    if (opr === 'IN' || opr === 'NIN') {
+      res = val.split(',')
+      res = res.map(val => {
+        return DBx.valueFormater(val)
+      })
+      console.log(opr, val, res)
+    }
+    return res
+  }
   
   function reloadData () {
     var columns = getColumnFillable()
@@ -629,7 +647,7 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
     for (col of columns) {
       var operator = el(`#filter_operator_${col}`).value
       var value = el(`#filter_value_${col}`).value
-      if (value) DataModel.where(col, operator, value)
+      if (value) DataModel.where(col, operator, handleInOperatorData(value, operator) )
     }
 
     var valueId = el(`#filter_value_id`).value
@@ -641,8 +659,8 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
     var val1 = el(`#filter2_value1`).value
     var val2 = el(`#filter2_value2`).value
     if (val1 && val2) {
-      DataModel.where(colx, opr1, val1)
-      DataModel.where(colx, opr2, val2)
+      DataModel.where(colx, opr1, handleInOperatorData(val1, opr1))
+      DataModel.where(colx, opr2, handleInOperatorData(val2, opr2))
     }
 
     const data = DataModel.get()
