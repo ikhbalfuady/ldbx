@@ -1,4 +1,4 @@
-/* LDBX Version 1.1.4
+/* LDBX Version 1.2.5
 Author : ikhbalfuady@gmail.com
 This some utilities script to help you manage localStorage data
 the style syntax similary like laravel eloquent to help you easy to understod the query
@@ -8,6 +8,7 @@ avail to save, update, delete, get all & get single
 /* LocalStorage Helper */
 class DB {
   constructor() {
+    this.key = null
     if (typeof(Storage) !== "undefined") {
       // console.log('LocalStorage initialize')
       return true
@@ -41,37 +42,49 @@ class DB {
 
   formater(val) {
     if (!val) {
-      console.warn('failed to extract data', val)
+      console.warn(`Failed to extract data [${this.key}]`, val)
       return null
     }
   
-    const [format, value] = val.split("|");
-    if (format === 'obj') return JSON.parse(value);
-    if (format === 'num') return parseFloat(value);
-    if (format === 'bol') return value === 'true';
-    return value;
+    const [format, value] = val.split("|")
+    if (format === 'obj') return JSON.parse(value)
+    if (format === 'num') return parseFloat(value)
+    if (format === 'bol') return value === 'true'
+    return value
   }
 
   save (key, value) {
+    this.key = key
     localStorage.setItem(key, this.setter(value))
   }
 
   get (key) {
+    this.key = key
     var val = localStorage.getItem(key)
     val = this.formater(val)
     return val
   }
 
   remove (key) {
+    this.key = key
     return localStorage.removeItem(key)
   }
 }
 
 /* Eloquent */
-class Model {
-  constructor(tableName = null, showLog = true) {
+class LDBX {
+  constructor(tableOrConfig = null, showLog = true, softDelete = true) {
+    if (typeof(tableOrConfig) === 'object') {
+      if (tableOrConfig.table) this.tableName = tableOrConfig.table
+      else this.console("Table name not defined, plese make object with name 'table' if you using object config params!")
+
+      if (tableOrConfig.softDelete) this.softDelete = tableOrConfig.softDelete
+      if (tableOrConfig.showLog) this.showLog = tableOrConfig.showLog
+    }
+    this.tableName = tableOrConfig // localstorage key name
     this.showLog = showLog // log performance
-    this.tableName = tableName // localstorage key name
+    this.softDelete = softDelete // softDelete
+    this.onlyData = softDelete ? 'active' : 'all' // data filtering : active,trash,all
 
     /* whereCondition : arrayObject
       N   : IS NULL
@@ -87,8 +100,9 @@ class Model {
 
     /* orderCondition : arrayObject
       {
-        key   : String,
-        type  : Enum('asc','desc),
+        key         : String,
+        type        : Enum('asc','desc),
+        dateFormat  : Boolean,
       }
     */
     this.orderCondition = []
@@ -106,6 +120,20 @@ class Model {
 
     /* LocalStorage Instance */
     this.DB = new DB()
+  }
+
+  getFillableColumn (obj) {
+    var res = []
+    for (k in obj) { res.push(k) } 
+    return res
+  }
+
+  resetProps () {
+    this.whereCondition = []
+    this.orderCondition = []
+    this.belongsToRelation = []
+    this.hasManyRelation = []
+    this.onlyData = this.softDelete ? 'active' : 'all'
   }
 
   // Utilities
@@ -138,11 +166,11 @@ class Model {
       `background: ${theme[type].background}`,
       'font-size: 11px',
       'padding: 5px',
-    ].join(';'); // 2. Concatenate the individual array item and concatenate them into a string separated by a semi-colon (;)
+    ].join('') // 2. Concatenate the individual array item and concatenate them into a string separated by a semi-colon ()
 
     // 3. Pass the styles variable
     var csl = '%c'+ '[LDBX]⇒ ' +msg
-    if (this.showLog ) {
+    if (this.showLog) {
       if (type === 'info') console.info(csl, styles)
       else if (type === 'warning') console.warn(csl, styles)
       else if (type === 'danger') console.error(csl, styles)
@@ -150,21 +178,42 @@ class Model {
     }
   }
 
+  dateNow () {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = `0${date.getMonth() + 1}`.slice(-2);  // Add 1 to the month because it is 0-based, and pad with a leading 0 if necessary
+    const day = `0${date.getDate()}`.slice(-2);  // Pad with a leading 0 if necessary
+    const hour = `0${date.getHours()}`.slice(-2);  // Pad with a leading 0 if necessary
+    const minute = `0${date.getMinutes()}`.slice(-2);  // Pad with a leading 0 if necessary
+    return `${year}-${month}-${day} ${hour}:${minute}`;
+  }
+
+  hasData () {
+    var table = this.DB.get(this.tableName)
+    if (table && table.length) {
+      this.console(`[hasData] ${this.tableName} : true`, 'info')
+      return true
+    } else {
+      this.console(`[hasData] ${this.tableName} : false`, 'info')
+      return false
+    }
+  }
+
   /* 
     fillableColumns : ['id', 'name', 'code']
   */
   fixStructure (fillableColumns) {
-    var data = this.fetch(this.tableName) || [];
-    const hasId = fillableColumns.includes('id');
-    if (!hasId) fillableColumns.push('id');
+    var data = this.fetch(this.tableName) || []
+    const hasId = fillableColumns.includes('id')
+    if (!hasId) fillableColumns.push('id')
   
     data = data.map(row => {
-      const fixRow = {};
+      const fixRow = {}
       fillableColumns.forEach(col => {
-        fixRow[col] = row[col] || null;
-      });
-      return fixRow;
-    });
+        fixRow[col] = row[col] || null
+      })
+      return fixRow
+    })
 
     this.DB.save(this.tableName, data) // commiting
     console.info(`Success updating structure [${this.tableName}]`, fillableColumns, data)
@@ -173,16 +222,17 @@ class Model {
   /* criteria = whereCondition */
   fetch (tableName, criteria = [], tag = '') {
     const start = performance.now()
-    var table = this.DB.get(tableName)
-    var data = null
+    var table = this.DB.get(tableName) || []
+    var data = []
     if (table) {
       if (criteria.length) data = this.query(table, criteria)
-      else data = table
+      else data = this.handleSoftDeleteData(table)
     }
 
     if (this.orderCondition.length) {
       for (let order of this.orderCondition) {
-        data = this.sortBy(data, order.key, order.type)
+        if (order.dateFormat) data = this.sortByDateFormat(data, order.key, order.type)
+        else data = this.sortBy(data, order.key, order.type)
       }
     }
 
@@ -193,19 +243,46 @@ class Model {
 
   sortBy(data, key, order = 'asc') {
     return data.sort((a, b) => {
-      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
-      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
-      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
-    });
+      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key]
+      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key]
+      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0
+    })
+  }
+
+  sortByDateFormat(data, key, order = 'asc') {
+    return data.sort((a, b) => {
+      const aValue = new Date(a[key]);
+      const bValue = new Date(b[key]);
+      if (order === 'asc') return aValue - bValue;
+      else return bValue - aValue;
+    })
+  }
+
+  handleSoftDeleteObj (obj) {
+    let res = false
+    if (this.softDelete) {
+      if (this.onlyData === 'active' && !obj.deleted_at) res = true
+      else if (this.onlyData === 'trash' && obj.deleted_at) res = true
+      else if (this.onlyData === 'all' && obj.deleted_at) res = true
+    } else res = true
+    return res
+  }
+
+  handleSoftDeleteData (data) {
+    var res = []
+    for  (let i = 0; i < data.length; i++) {
+      if (data[i] && this.handleSoftDeleteObj(data[i])) res.push(data[i])
+    }
+    return res
   }
 
   compareValues (key, order = 'asc') {
     return function(a, b) {
-      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) return 0;
-      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
-      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
-      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0;
-    };
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) return 0
+      const aValue = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key]
+      const bValue = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key]
+      return aValue > bValue ? (order === 'asc' ? 1 : -1) : aValue < bValue ? (order === 'asc' ? -1 : 1) : 0
+    }
   }
 
   operator (operator, value, valueComparison) {
@@ -224,6 +301,7 @@ class Model {
   }
 
   query (data, criteria = []) {
+    console.log('asd', this.tableName, this.onlyData)
     var countWhere = criteria ? criteria.length : 0
     if (countWhere === 0) return data
     var res = []
@@ -236,15 +314,32 @@ class Model {
         var value = where.value ? where.value : null
         if (this.operator(where.operator, colVal, value)) match = match + 1
       }
-      if (match === countWhere) res.push(val)
+      if (match === countWhere) {
+        // if (this.softDelete) {
+        //   if (this.onlyData === 'active' && !val.deleted_at) res.push(val)
+        //   else if (this.onlyData === 'trash' && val.deleted_at) res.push(val)
+        //   else if (this.onlyData === 'all' && val.deleted_at) res.push(val)
+        // } else res.push(val)
+        if (this.handleSoftDeleteObj(val)) res.push(val)
+      }
     }
     // console.info(`querying ${totalChecked} of ${data.length} data`)
     return res
   }
 
-  // chain
-  orderBy (key, type = 'asc') {
-    this.orderCondition.push({ key: key, type: type})
+  // Chain
+  trashed() {
+    this.onlyData = 'trash'
+    return this
+  }
+
+  withTrashed() {
+    this.onlyData = 'all'
+    return this
+  }
+
+  orderBy (key, type = 'asc', dateFormat = false) {
+    this.orderCondition.push({ key: key, type: type, dateFormat})
     return this
   }
 
@@ -255,16 +350,16 @@ class Model {
       value: value ? value : oprOrVal,
     }
 
-    if (oprOrVal.toLowerCase() === 'n') criteria = { key: col, operator: 'N', value: null}
-    if (oprOrVal.toLowerCase() === 'nn') criteria = { key: col, operator: 'NN', value: null}
-    if (oprOrVal.toLowerCase() === 'in') criteria = { key: col, operator: 'IN', value: value}
-    if (oprOrVal.toLowerCase() === 'nin') criteria = { key: col, operator: 'NIN', value: value}
+    if (criteria.operator.toLowerCase() === 'n') criteria = { key: col, operator: 'N', value: null}
+    if (criteria.operator.toLowerCase() === 'nn') criteria = { key: col, operator: 'NN', value: null}
+    if (criteria.operator.toLowerCase() === 'in') criteria = { key: col, operator: 'IN', value: value}
+    if (criteria.operator.toLowerCase() === 'nin') criteria = { key: col, operator: 'NIN', value: value}
 
     this.whereCondition.push(criteria)
     return this
   }
 
-  // relations
+  // Relations
   collectRelation (data) {
     return data.map( obj => {
       if (this.belongsToRelation.length) obj = this.getRelation(obj, 'belongsTo')
@@ -275,8 +370,6 @@ class Model {
 
   getRelation(obj, type = 'belongsTo') {
     var relationMapName = `${type}Relation` 
-    // if (!this[relationMapName]) return obj
-
     this[relationMapName].map(rel => {
       let objRel = this.fetch(rel.tableName, [{key: rel.targetKey, operator: '=', value: obj[rel.foreignKey]}])
       // console.info(`${type} ${rel.tableName} WHERE ${rel.targetKey} = ${obj[rel.foreignKey]}`)
@@ -310,16 +403,19 @@ class Model {
     return this
   }
 
-  // trigger
+  // Trigger
   get () {
     var data = this.fetch(this.tableName, this.whereCondition)
+    console.log('get', this.onlyData, data)
     data = this.collectRelation(data)
+    this.resetProps()
     return data
   }
 
   first () {
     var data = this.fetch(this.tableName, this.whereCondition)
     data = this.collectRelation(data)
+    this.resetProps()
     return data.length ? data[0] : null 
   }
 
@@ -327,28 +423,35 @@ class Model {
     return this.where('id', id).first()
   }
 
-  // commiting
+  // Commiting
   save (data) {
     let id = this.UUID()
+    const created_at = this.dateNow()
+    const updated_at = this.dateNow()
+    const deleted_at = null
+
     if (data.id) id = data.id
     const table = this.DB.get(this.tableName)
-    const db = table ? [...table, { ...data, id }] : [{ ...data, id }] // merging 
+    const db = table ? [...table, { ...data, id, created_at, updated_at, deleted_at }] : [{ ...data, id, created_at, updated_at, deleted_at }] // merging 
     this.DB.save(this.tableName, db) // commiting
     this.console(`Success saving [${this.tableName}]`, 'success')
+    this.resetProps()
     return { ...data, id }
   }
 
   update (data) {
+    data.updated_at = this.dateNow()
     var db = this.fetch(this.tableName, [])
-    const index = db.findIndex(item => item.id === data.id);
+    const index = db.findIndex(item => item.id === data.id)
     if (index >= 0) {
       db[index] = data
       // commiting
       this.DB.save(this.tableName, db)
       this.console(`Succes updating [${this.tableName}]`, 'success')
+      this.resetProps()
       return data
     } else {
-      this.console(`index of id [${data.id}] not found in data "${this.tableName}" `, 'danger')
+      this.console(`update:: index of id [${data.id}] not found in data "${this.tableName}" `, 'danger')
       return false
     }
 
@@ -358,19 +461,25 @@ class Model {
     return this.DB.remove(this.tableName)
   }
 
-  delete (id) {
+  delete (id, force = false) {
     var db = this.fetch(this.tableName, [])
-    const index = db.findIndex(item => item.id === id);
+    const index = db.findIndex(item => item.id === id)
     if (index >= 0) {
       // commiting
-      const newArr = db.slice(0, index).concat(db.slice(index + 1));
-      this.DB.save(this.tableName, newArr)
+      if (this.softDelete && force === false) {
+        db[index].deleted_at = this.dateNow()
+        this.DB.save(this.tableName, db)
+      } else {
+        const newArr = db.slice(0, index).concat(db.slice(index + 1))
+        this.DB.save(this.tableName, newArr)
+      }
       this.console(`Succes updating [${this.tableName}]`, 'success')
     } else {
-      this.console(`index of id [${id}] not found in data "${this.tableName}" `, 'danger')
+      this.console(`delete: index of id [${id}] not found in data "${this.tableName}" `, 'danger')
       return false
     }
   }
+
 
 }
 

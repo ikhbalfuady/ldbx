@@ -43,6 +43,10 @@ pre {
     opacity: 1;
 }
 
+.hljs-comment {
+    color: #888;
+  }
+
 
 .docx table {
     border: 1px solid #1C6EA4;

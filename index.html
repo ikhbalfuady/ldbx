@@ -29,7 +29,7 @@
     </style>
     
     <!-- Custom styles for this template -->
-    <link href="style.css?v=1.0.2" rel="stylesheet">
+    <link href="style.css?v=1.0.3" rel="stylesheet">
   </head>
 <body>
 
@@ -39,7 +39,7 @@
     <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
       <a href="/" class="d-flex align-items-center text-dark text-decoration-none logo">
         <span class="fs-4 fw-bold">LDBX</span> 
-      </a> <sup class="d-none d-md-block versioning" >v.1.1.4</sup>
+      </a> <sup class="d-none d-md-block versioning" >v.1.2.5</sup>
 
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
         <a class="me-3 py-2 text-dark text-decoration-none" href="https://github.com/ikhbalfuady/ldbx">Github</a>
@@ -51,7 +51,7 @@
 
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
       <h1 class="display-4 fw-normal">LDBX</h1>
-      <p class="fs-5 text-muted">Local Storage management with syntax style like <a href="https://laravel.com/" target="_blank">Laravel</a> Eloquent using native Javascript</p>
+      <p class="fs-5 text-muted">Local Storage management with sweet syntax style & feature like <a href="https://laravel.com/" target="_blank">Laravel</a> Eloquent using native Javascript</p>
     </div>
   </header>
 
@@ -64,7 +64,7 @@
     <div class="col-xs-12 col-sm-6">
       <div class="table-responsive">
         <div class="text-center px-2"><h4 class="fw-bold">Table / Source</h4>
-          <input id="tableName" value="users" class="form-control input-form" >
+          <input id="tableName" onchange="refreshObject()" value="users" class="form-control input-form" >
         </div>
         <table class="table text-center">
           <thead>
@@ -201,6 +201,7 @@
     <div class="col-xs-12 ">
       <div class="table-responsive">
         <button onClick="cleanUp()" class="btn btn-danger btn-full">Clear LDB</button>
+        <button onClick="refreshObject()" class="btn btn-info btn-full">Refresh Data</button>
         <button data-bs-toggle="modal" data-bs-target="#filterModal" class="btn btn-secondary">Filter / Query</button>
         <table class="table text-center">
           <thead id="tableHead"></thead>
@@ -231,31 +232,62 @@
       </div>
       <div class="col-sm-12 docx">
         <!-- Start -->
+<p><strong>Initialize Table</strong></p>
+<p>There are 3 params in constructor  :</p>
+<blockquote>
+<p>using params default</p>
+<ol>
+<li>Table Name [String] (Required)</li>
+<li>Query Log in console [Boolean] (Optional)</li>
+<li>Soft Delete [Boolean] (Optional)</li>
+</ol>
+<p>using config params 
+you can using object configuration params with structure like this :</p>
+<pre><code>{
+  <span class="hljs-attribute">table</span>: String,
+  showLog: Boolean,
+  softDelete: Boolean,
+}
+</code></pre></blockquote>
+<p>Example instance</p>
+<pre><code>
+<span class="hljs-comment">// Using default params</span>
+<span class="hljs-keyword">const</span> DataModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>, <span class="hljs-keyword">true</span>, <span class="hljs-keyword">false</span>) 
+
+
+<span class="hljs-comment">// Using Config params</span>
+<span class="hljs-keyword">const</span> config = {
+  table: <span class="hljs-string">'users'</span>,
+  <span class="hljs-built_in">log</span>: <span class="hljs-keyword">true</span>,
+  softDelete: <span class="hljs-keyword">false</span>,
+}
+<span class="hljs-keyword">const</span> DataModel = <span class="hljs-keyword">new</span> LDBX(config)
+</code></pre><hr>
 <p><strong>Get All Data</strong></p>
-<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> list = UserModel.<span class="hljs-keyword">get</span>()
 </code></pre><hr>
 <p><strong>Get first / single data</strong></p>
-<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
-<span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'id'</span>, id).first()
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'id'</span>, id).first() <span class="hljs-comment">// *first its mean, first of result query</span>
 </code></pre><hr>
 <p><strong>Single selection where</strong></p>
-<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'name'</span>, <span class="hljs-string">'ikhbalfuady'</span>).<span class="hljs-keyword">get</span>()
 </code></pre><hr>
 <p><strong>Multiple selection where</strong></p>
 <pre><code><span class="hljs-comment">// using custom operator</span>
-<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> data = UserModel.<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&gt;='</span> <span class="hljs-number">18</span>)
             .<span class="hljs-keyword">where</span>(<span class="hljs-string">'age'</span>, <span class="hljs-string">'&lt;='</span>, <span class="hljs-number">25</span>)
             .<span class="hljs-keyword">get</span>()
 </code></pre><hr>
 <p><strong>Find by id</strong></p>
-<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
 <span class="hljs-keyword">var</span> data = UserModel.find(id)
 </code></pre><hr>
 <p><strong>Store Data</strong></p>
-<pre><code><span class="hljs-title">const</span> <span class="hljs-type">UserModel</span> = new <span class="hljs-type">Model</span>('users')
+<pre><code><span class="hljs-title">const</span> <span class="hljs-type">UserModel</span> = new <span class="hljs-type">LDBX</span>('users')
 <span class="hljs-title">let</span> <span class="hljs-class"><span class="hljs-keyword">data</span> = {
   <span class="hljs-title">name</span>: "<span class="hljs-type">John</span>",
   <span class="hljs-title">age</span>: 21
@@ -264,7 +296,7 @@
 <span class="hljs-type">UserModel</span>.save(<span class="hljs-class"><span class="hljs-keyword">data</span>)</span>
 </code></pre><hr>
 <p><strong>Update Data</strong></p>
-<pre><code>const UserModel = new Model(<span class="hljs-string">'users'</span>)
+<pre><code>const UserModel = new LDBX(<span class="hljs-string">'users'</span>)
 let <span class="hljs-keyword">data</span> = UserModel.find(id)
 <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">data</span>) throw error(`user <span class="hljs-keyword">with</span> id<span class="hljs-string">"${id}"</span> <span class="hljs-built_in">not</span> found `)
 
@@ -273,9 +305,13 @@ let <span class="hljs-keyword">data</span> = UserModel.find(id)
 UserModel.update(<span class="hljs-keyword">data</span>)
 </code></pre><hr>
 <p><strong>Delete Data</strong></p>
-<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> Model(<span class="hljs-string">'users'</span>)
-UserModel.<span class="hljs-keyword">delete</span>(id)
-</code></pre><h3 class="mb-3 mt-3 text-primary fw-bold" id="avail-operator">Avail Operator</h1>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-built_in">new</span> LDBX(<span class="hljs-string">'users'</span>)
+UserModel.<span class="hljs-built_in">delete</span>(id) <span class="hljs-comment">// default soft delete</span>
+
+<span class="hljs-comment">// permanent delete</span>
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-built_in">new</span> LDBX(<span class="hljs-string">'users'</span>)
+UserModel.<span class="hljs-built_in">delete</span>(id, <span class="hljs-literal">true</span>)
+</code></pre><h1 id="avail-where-operator">Avail &quot;<strong>Where</strong>&quot; Operator</h1>
 <table>
 <thead>
 <tr>
@@ -349,15 +385,93 @@ UserModel.<span class="hljs-keyword">delete</span>(id)
 </tbody>
 </table>
 <hr>
-<h3 class="fw-bold text-primary mb-3 mt-4" id="other-features">Other Features</h1>
-<p><strong>orderBy(key, type?)</strong></p>
+<h1 id="other-features">Other Features</h1>
+<p><strong>trashed()</strong></p>
+<p>this is method chaining to getting only trashed data</p>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">LDBX</span>(<span class="hljs-string">'users'</span>)
+.trashed()
+.<span class="hljs-keyword">get</span>()
+</code></pre><p><strong>withTrashed()</strong></p>
+<p>this is method chaining to getting all with trashed data if you using <strong>softDelete</strong></p>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">LDBX</span>(<span class="hljs-string">'users'</span>)
+.withTrashed()
+.<span class="hljs-keyword">get</span>()
+</code></pre><p><strong>truncate()</strong></p>
+<p>this is method chaining to clean up data </p>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">LDBX</span>(<span class="hljs-string">'users'</span>)
+.truncate()
+</code></pre><p><strong>hasData()</strong></p>
+<p>this is method chaining to checking table has already have data or not</p>
+<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">LDBX</span>(<span class="hljs-string">'users'</span>)
+.hasData()
+</code></pre><p><strong>getFillableColumn()</strong></p>
+<p>this is method chaining to getting fillable columns of object you set</p>
+<pre><code><span class="hljs-comment">// getting fillable of existing data</span>
+<span class="hljs-selector-tag">var</span> UserModel = new LDBX(<span class="hljs-string">'users'</span>)
+<span class="hljs-selector-tag">var</span> user = UserModel.find(<span class="hljs-number">1</span>)
+<span class="hljs-selector-tag">var</span> fillableColumns = UserModel.getFillableColumn(user)
+</code></pre><p><strong>fixStructure()</strong></p>
+<p>this is method chaining to fixing structure like ALTER TABLE in SQL\
+when you chaning structure of object model you have, you just call this method for fix that
+example :</p>
+<pre><code><span class="hljs-comment">// current model</span>
+<span class="hljs-keyword">let</span> UsersSpec = {
+  <span class="hljs-attribute">dbConfig</span>: {
+    <span class="hljs-attribute">table</span>: <span class="hljs-string">'users'</span>,
+    <span class="hljs-attribute">showLog</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attribute">softDelete</span>: <span class="hljs-literal">true</span>,
+  },
+  <span class="hljs-attribute">dataModel</span>: {
+    <span class="hljs-attribute">id:</span><span class="hljs-string"> null</span>,
+    <span class="hljs-attribute">name</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attribute">email</span>: <span class="hljs-literal">null</span>
+  }
+}
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(UsersSpec.dbConfig)
+<span class="hljs-keyword">const</span> fillableColumns = UserModel.getFillableColumn(UsersSpec.dataModel)
+<span class="hljs-comment">/* return 
+['id', 'name', 'email']
+*/</span>
+
+<span class="hljs-comment">// and you want to change the users to model to like this</span>
+<span class="hljs-keyword">let</span> UsersSpec = {
+  <span class="hljs-attribute">dbConfig</span>: {
+    <span class="hljs-attribute">table</span>: <span class="hljs-string">'users'</span>,
+    <span class="hljs-attribute">showLog</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attribute">softDelete</span>: <span class="hljs-literal">true</span>,
+  },
+  <span class="hljs-attribute">dataModel</span>: {
+    <span class="hljs-attribute">id:</span><span class="hljs-string"> null</span>,
+    <span class="hljs-attribute">name</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attribute">email</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attribute">phone</span>: <span class="hljs-literal">null</span>, <span class="hljs-comment">// new</span>
+    <span class="hljs-attribute">born_date</span>: <span class="hljs-literal">null</span>, <span class="hljs-comment">// new</span>
+  }
+}
+
+<span class="hljs-comment">// just do like this</span>
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(UsersSpec.dbConfig)
+<span class="hljs-keyword">const</span> newFillableColumns = UserModel.getFillableColumn(UsersSpec.dataModel)
+UserModel.fixStructure(newFillableColumns) <span class="hljs-comment">// all of data will be updated with new fillable structure</span>
+</code></pre><p><strong>orderBy(key, type?, dateFormat?)</strong></p>
 <p>this is method chaining to implementing &quot;order data&quot; of result query \</p>
 <ul>
-<li>key : object key</li>
-<li>type : asc / desc (default : asc)</li>
+<li>key : String // object key</li>
+<li>type : Enum(asc,desc) (default : asc)</li>
+<li>dateFormat : Boolean (default : false) // for sorting date type data</li>
 </ul>
-<pre><code><span class="hljs-selector-class">.orderBy</span>(<span class="hljs-string">'key'</span>) <span class="hljs-comment">// order ASC</span>
-<span class="hljs-selector-class">.orderBy</span>(<span class="hljs-string">'key'</span>, <span class="hljs-string">'desc'</span>) <span class="hljs-comment">// order DESC</span>
+<pre><code><span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'jorunal'</span>)
+.orderBy(<span class="hljs-string">'key'</span>) <span class="hljs-comment">// order ASC</span>
+.<span class="hljs-keyword">get</span>()
+
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'jorunal'</span>)
+.orderBy(<span class="hljs-string">'key'</span>, <span class="hljs-string">'desc'</span>) <span class="hljs-comment">// order DESC</span>
+.<span class="hljs-keyword">get</span>()
+
+<span class="hljs-comment">// ordering date data</span>
+<span class="hljs-keyword">const</span> UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'transaction'</span>)
+.orderBy(<span class="hljs-string">'date'</span>, <span class="hljs-string">'desc'</span>, <span class="hljs-literal">true</span>) <span class="hljs-comment">// fot better result activate date format with set 3 in third parameter</span>
+.<span class="hljs-keyword">get</span>()
 </code></pre><ul>
 <li>Atenttion : order can only be executed once per query, even if you add multiple &#39;orderBy&#39;, the last &#39;orderBy&#39; is recognized</li>
 </ul>
@@ -371,31 +485,99 @@ this method will be created new single object for every object result data \</p>
 <li>newObjectName : object name for the relation , ex : role</li>
 <li>targetKey : target key object of source data, default is &quot;id&quot;</li>
 </ul>
-<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
-.belongsTo(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'role'</span>) <span class="hljs-comment">// simply version</span>
-.first()
+<pre><code>const UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'users'</span>)
+.belongsTo(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'role'</span>) // simply <span class="hljs-keyword">version</span>
+.<span class="hljs-keyword">first</span>()
 
-<span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
-.belongsTo(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenue'</span>, <span class="hljs-string">'code'</span>) <span class="hljs-comment">// full version</span>
-.<span class="hljs-keyword">get</span>()
-</code></pre>
-<hr>
+/* <span class="hljs-keyword">return</span> 
+{
+  id: <span class="hljs-number">1</span>
+  name: <span class="hljs-string">'John'</span>,
+  role_id: <span class="hljs-number">1</span>,
+  role<span class="hljs-variable">s:</span> {
+    id: <span class="hljs-number">1</span>,
+    name: <span class="hljs-string">'Admin'</span>,
+  },
+}
+*/
+
+const UserModel = <span class="hljs-keyword">new</span> LDBX(<span class="hljs-string">'jorunal'</span>)
+.belongsTo(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenue'</span>, <span class="hljs-string">'code'</span>) // full <span class="hljs-keyword">version</span>
+.<span class="hljs-built_in">get</span>()
+
+/* <span class="hljs-keyword">return</span> 
+[
+  {
+    id: <span class="hljs-number">1</span>
+    name: <span class="hljs-string">'TRX Forex'</span>,
+    coa_revenue_code: <span class="hljs-string">'101020230'</span>
+    coa_revenue: {
+      code: <span class="hljs-string">'101020230'</span>,
+      name: <span class="hljs-string">'Fix Revenue'</span>,
+    }
+  },
+  {
+    id: <span class="hljs-number">2</span>
+    name: <span class="hljs-string">'TRX others'</span>,
+    coa_revenue_code: <span class="hljs-string">'4305353353'</span>
+    coa_revenue: {
+      code: <span class="hljs-string">'4305353353'</span>,
+      name: <span class="hljs-string">'Other Revenue'</span>,
+    }
+  }
+]
+*/
+</code></pre><hr>
 <p><strong>hasMany(tableName, foreignKey, newObjectName?, targetKey?)</strong></p>
-<p>this is method chaining to implementing relation of some data \
-this method will be created new single object for every object result data \</p>
+<p>this is method chaining to implementing relation of some data\
+this method will be created new single object with array result for every object in result data\</p>
 <ul>
 <li>tableName : name of table</li>
 <li>foreignKey : foreign key object, ex : role_id</li>
 <li>newObjectName : object name for the relation , ex : role</li>
 <li>targetKey : target key object of source data, default is &quot;id&quot;</li>
 </ul>
-<pre><code><span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
-.hasMany(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'roles'</span>) <span class="hljs-comment">// simply version</span>
+<pre><code>const UserModel = new LDBX(<span class="hljs-string">'users'</span>)
+.hasMany(<span class="hljs-string">'roles'</span>, <span class="hljs-string">'role_id'</span>, <span class="hljs-string">'roles'</span>) // simply version
 .first()
+/* <span class="hljs-keyword">return</span> 
+{
+  id: <span class="hljs-number">1</span>
+  name: <span class="hljs-string">'John'</span>,
+  roles: [
+    {
+      id: <span class="hljs-number">1</span>,
+      name: <span class="hljs-string">'Admin'</span>,
+    },
+    {
+      id: <span class="hljs-number">2</span>,
+      name: <span class="hljs-string">'Staff'</span>,
+    }
+  ],
+}
+*/
 
-<span class="hljs-keyword">var</span> UserModel = <span class="hljs-keyword">new</span> <span class="hljs-type">Model</span>(<span class="hljs-string">'users'</span>)
-.hasMany(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenues'</span>, <span class="hljs-string">'code'</span>) <span class="hljs-comment">// full version</span>
-.<span class="hljs-keyword">get</span>()
+const UserModel = new LDBX(<span class="hljs-string">'jorunal'</span>)
+.hasMany(<span class="hljs-string">'coa'</span>, <span class="hljs-string">'coa_revenue_code'</span>, <span class="hljs-string">'coa_revenues'</span>, <span class="hljs-string">'code'</span>) // full version
+.get()
+
+/* <span class="hljs-keyword">return</span> 
+[
+  {
+    id: <span class="hljs-number">1</span>
+    name: <span class="hljs-string">'transaction'</span>,
+    coa_revenues: [
+      {
+        code: <span class="hljs-string">'101020230'</span>,
+        name: <span class="hljs-string">'Fix Reveneu'</span>,
+      },
+      {
+          code: <span class="hljs-string">'105020230'</span>,
+        name: <span class="hljs-string">'Other Revenue
+    ],
+  }
+]
+*/</span>
 </code></pre>
         <!-- End -->
       </div>
@@ -413,15 +595,20 @@ this method will be created new single object for every object result data \</p>
   </footer>
 </div>
 
-<script src="ldbx.js?v=1.1.4"></script>
+<script src="ldbx.min.js?v=1.2.5"></script>
 <script>
 
   let counter = 4;
-    
-  var tableName = document.querySelector('#tableName').value
-  var DBx = new DB();
-  var DataModel = new Model(tableName)
+  const tableName = document.querySelector('#tableName').value
+  const DBx = new DB();
+  var DataModel = InitModel()
   const objectModel = document.getElementById('objectModel');
+
+  function InitModel () {
+    const tableName = document.querySelector('#tableName').value
+    return new LDBX(tableName)
+  }
+     
   
   // Function to add a new tr element
   function addTrElement() {
@@ -612,6 +799,7 @@ this method will be created new single object for every object result data \</p>
   }
 
   function refreshObject () {
+    DataModel = InitModel()
     objectDisplayFormater(getObjectFromTable())
     // objectDisplayFormater(getObjectModelData())
 
@@ -635,10 +823,12 @@ this method will be created new single object for every object result data \</p>
 
     var list = DataModel.get() || []
 
-    if (list && !list.length) {
-    
-      for (row of send) {
-        DataModel.save(row)
+    if (tableName === 'users') {
+      if (list && !list.length) {
+      
+        for (row of send) {
+          DataModel.save(row)
+        }
       }
     }
   }
@@ -688,7 +878,7 @@ this method will be created new single object for every object result data \</p>
   function reloadData () {
     var columns = getColumnFillable()
 
-    var DataModel = new Model(tableName)
+    var DataModel = new LDBX(tableName)
     for (col of columns) {
       var operator = el(`#filter_operator_${col}`).value
       var value = el(`#filter_value_${col}`).value
@@ -763,7 +953,7 @@ this method will be created new single object for every object result data \</p>
 
   // preparation form edit & inject data
   function editData (id) {
-    var data = new Model(tableName).find(id)
+    var data = new LDBX(tableName).find(id)
     console.log('edit', data)
     var input = ''
     for (k in data) {
@@ -783,7 +973,7 @@ this method will be created new single object for every object result data \</p>
   // commit changes data
   function updateData () {
     var id = el(`#form_col_id`).value || null
-    let DataModel = new Model(tableName)
+    let DataModel = new LDBX(tableName)
     var data = DataModel.find(id) 
     for (k in data) {
       data[k] = el(`#form_col_${k}`).value || null
@@ -799,7 +989,7 @@ this method will be created new single object for every object result data \</p>
   function deleteData (id) {
     console.log('deleteData', id)
     if (confirm('Are you sure want to delete this data ?')) {
-      let DataModel = new Model(tableName)
+      let DataModel = new LDBX(tableName)
       DataModel.delete(id)
       getAllData()
     }
